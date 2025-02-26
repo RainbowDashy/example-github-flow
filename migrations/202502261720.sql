@@ -1,3 +1,3 @@
-create table wegojir (
+create table IF NOT EXISTS wegojir (
     erew int
 );
