@@ -20,6 +20,7 @@ jobs:
   deploy_to_test:
     needs: build
     runs-on: ubuntu-latest
+    environment: test
     env:
       BYTEBASE_URL: https://demo.bytebase.com
       BYTEBASE_SERVICE_ACCOUNT: ci@service.bytebase.com
@@ -72,6 +73,7 @@ jobs:
   deploy_to_prod:
     needs: deploy_to_test
     runs-on: ubuntu-latest
+    environment: prod
     env:
       BYTEBASE_URL: https://demo.bytebase.com
       BYTEBASE_SERVICE_ACCOUNT: ci@service.bytebase.com
