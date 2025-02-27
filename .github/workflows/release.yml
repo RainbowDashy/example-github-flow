@@ -25,8 +25,10 @@ jobs:
       BYTEBASE_URL: https://demo.bytebase.com
       BYTEBASE_SERVICE_ACCOUNT: ci@service.bytebase.com
       BYTEBASE_PROJECT: "projects/project-sample"
-      BYTEBASE_TARGETS: "instances/test-sample-instance/databases/hr_test"
+      BYTEBASE_TARGETS: "instances/test-sample-instance/databases/hr_test,instances/prod-sample-instance/databases/hr_prod"
       FILE_PATTERN: "migrations/*.sql"
+    outputs:
+      bytebase_plan: ${{ steps.create_plan.outputs.plan }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -66,6 +68,7 @@ jobs:
           url: ${{ env.BYTEBASE_URL }}
           token: ${{ steps.login.outputs.token }}
           plan: ${{ steps.create_plan.outputs.plan }}
+          target-stage: 'Test Stage'
       - name: Deploy app
         run: |
           echo "Deploying app to test environment..."
@@ -77,9 +80,6 @@ jobs:
     env:
       BYTEBASE_URL: https://demo.bytebase.com
       BYTEBASE_SERVICE_ACCOUNT: ci@service.bytebase.com
-      BYTEBASE_PROJECT: "projects/project-sample"
-      BYTEBASE_TARGETS: "instances/prod-sample-instance/databases/hr_prod"
-      FILE_PATTERN: "migrations/*.sql"
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -90,28 +90,6 @@ jobs:
           bytebase-url: ${{ env.BYTEBASE_URL }}
           service-key: ${{ env.BYTEBASE_SERVICE_ACCOUNT }}
           service-secret: ${{secrets.BYTEBASE_SERVICE_ACCOUNT_SECRET}} # Please use secrets for sensitive data in production.
-      - name: Create release
-        id: create_release
-        uses: bytebase/create-release-action@v1
-        with:
-          url: ${{ env.BYTEBASE_URL }}
-          token: ${{ steps.login.outputs.token }}
-          file-pattern: ${{ env.FILE_PATTERN }}
-          # fail the action if release checks report any error.
-          check-release: "FAIL_ON_ERROR"
-          project: ${{ env.BYTEBASE_PROJECT }}
-          targets: ${{ env.BYTEBASE_TARGETS }}
-          validate-only: false
-      - name: Create plan
-        id: create_plan
-        uses: bytebase/create-plan-from-release-action@v1
-        with:
-          url: ${{ env.BYTEBASE_URL }}
-          token: ${{ steps.login.outputs.token }}
-          project: ${{ env.BYTEBASE_PROJECT }}
-          release: ${{ steps.create_release.outputs.release }}
-          targets: ${{ env.BYTEBASE_TARGETS }}
-          check-plan: "SKIP"
       - name: Rollout
         id: rollout
         uses: bytebase/rollout-action@v1
@@ -119,6 +97,7 @@ jobs:
           url: ${{ env.BYTEBASE_URL }}
           token: ${{ steps.login.outputs.token }}
           plan: ${{ steps.create_plan.outputs.plan }}
+          target-stage: 'Prod Stage'
       - name: Deploy app
         run: |
           echo "Deploying app to prod environment..."
