@@ -96,7 +96,7 @@ jobs:
         with:
           url: ${{ env.BYTEBASE_URL }}
           token: ${{ steps.login.outputs.token }}
-          plan: ${{ steps.create_plan.outputs.plan }}
+          plan: ${{ needs.deploy_to_test.outputs.bytebase_plan }}
           target-stage: 'Prod Stage'
       - name: Deploy app
         run: |
