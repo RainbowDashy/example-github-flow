@@ -25,6 +25,8 @@ jobs:
       BYTEBASE_URL: https://demo.bytebase.com
       BYTEBASE_SERVICE_ACCOUNT: ci@service.bytebase.com
       BYTEBASE_PROJECT: "projects/project-sample"
+      # The Bytebase rollout pipeline will deploy to 'test' and 'prod' environments.
+      # 'deploy_to_test' job rollouts the 'test' stage and 'deploy_to_prod' job rollouts the 'prod' stage.
       BYTEBASE_TARGETS: "instances/test-sample-instance/databases/hr_test,instances/prod-sample-instance/databases/hr_prod"
       FILE_PATTERN: "migrations/*.sql"
     outputs:
